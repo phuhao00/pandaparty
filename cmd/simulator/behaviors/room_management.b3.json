@@ -1,0 +1,53 @@
+{
+    "title": "RoomManagement",
+    "description": "Behavior tree for creating/joining a room",
+    "root": "sel_room_action",
+    "trees": [{
+        "id": "sel_room_action",
+        "title": "ChooseRoomAction",
+        "name": "Selector",
+        "category": "composite",
+        "children": [
+            "seq_create_room",
+            "seq_join_room"
+        ]
+    },{
+        "id": "seq_create_room",
+        "title": "CreateRoomActions",
+        "name": "Sequence",
+        "category": "composite",
+        "children": [
+             "action_create_room",
+             "action_player_ready"
+        ]
+    },{
+        "id": "seq_join_room",
+        "title": "JoinRoomActions",
+        "name": "Sequence",
+        "category": "composite",
+        "children": [
+            "action_join_room_by_id",
+            "action_player_ready"
+        ]
+    }],
+    "custom_nodes": [
+        {
+            "name": "ActionCreateRoom",
+            "category": "action",
+            "title": "Create a Room",
+            "description": "Simulates creating a new room"
+        },
+        {
+            "name": "ActionJoinRoomByID",
+            "category": "action",
+            "title": "Join Room by ID",
+            "description": "Simulates joining an existing room by its ID"
+        },
+        {
+            "name": "ActionPlayerReady",
+            "category": "action",
+            "title": "Set Player Ready",
+            "description": "Simulates setting the player as ready in the room"
+        }
+    ]
+}

@@ -1,0 +1,100 @@
+# Redis configuration for session storage, caching, etc.
+redis:
+  addr: "localhost:6379" # Redis server address and port (used for single node)
+  password: ""           # Redis password (if any), also used for Sentinel authenticated connections if needed.
+  db: 0                  # Redis database number, also used with Sentinel.
+  #
+  # For Redis Sentinel setup, ensure 'addr' might be one of the sentinel addresses or a placeholder if sentinel_addrs is exhaustive.
+  # Then, uncomment and configure the following:
+  # master_name: "mymaster"
+  # sentinel_addrs:
+  #   - "localhost:26379" # Example: replace with actual sentinel addresses
+  #   - "localhost:26380"
+  #   - "localhost:26381"
+  # # Note: 'password' and 'db' above are still used when connecting to the master via Sentinel.
+
+# MongoDB configuration for persistent data storage.
+mongo:
+  uri: "mongodb://localhost:27017" # MongoDB connection URI. This is the primary and simplest way.
+  # If the URI above is not sufficient, or you prefer a more structured configuration,
+  # you can use the fields below. Note that the official Go MongoDB driver gives precedence
+  # to the URI if both are fully specified. These options are useful if the URI is minimal
+  # (e.g. just "mongodb://localhost") or for clarity.
+  #
+  # hosts:
+  #   - "mongo1.example.com:27017"
+  #   - "mongo2.example.com:27017"
+  #   - "mongo3.example.com:27017"
+  # replica_set: "myReplicaSet"
+  # username: "myUser"
+  # password: "myPassword" # IMPORTANT: For production, use environment variables or a secrets manager for passwords.
+  # auth_source: "admin" # Or the database the user is defined in.
+  # connect_timeout_ms: 10000 # Connection timeout in milliseconds.
+  # max_pool_size: 100 # Maximum number of connections in the connection pool.
+  #
+  database: "dafuweng"             # Default database name for the application
+  collection: "config"             # Example collection (specific services might use others like 'players', 'friendships', 'payments')
+
+# Consul configuration for service discovery.
+consul:
+  addr: "localhost:8500" # Consul agent address and port.
+  # In a clustered environment, this should typically point to a local Consul agent
+  # running on the same node as this service. The local agent is then part of the
+  # larger Consul cluster and handles routing to Consul servers.
+  # Alternatively, for some setups, this could be a load balancer address 
+  # in front of multiple Consul servers, or a DNS name resolving to them.
+
+# NSQ configuration for asynchronous messaging.
+nsq:
+  nsqd_addr: "localhost:4150"     # NSQD address for producing messages (used if nsqd_addresses or nsqlookupd_http_addresses are not specified or for direct connection)
+  #
+  # For connecting to a list of NSQDs (e.g., for a producer that doesn't use lookupd):
+  nsqd_addresses:
+   - "localhost:4150"
+   - "localhost:4150"
+
+  # For NSQLookupd connections (primarily for consumers, but can also be used by producers to discover nsqds):
+  nsqlookupd_http_addresses:
+     - "localhost:4161"
+     - "localhost:4161"
+
+  topic: "dafuweng_topic"         # Default NSQ topic (can be overridden by specific producers/consumers)
+  channel: "dafuweng_channel"     # Default NSQ channel (can be overridden by specific consumers)
+
+# Server-specific configurations.
+server:
+  host: "localhost"       # Default host for services to register with Consul (e.g., the machine's IP or a resolvable hostname)
+  # port: 8080              # Default main port for services (e.g., loginserver's HTTP port) - Deprecated
+  loginserver_http_port: 8081
+  gmserver_http_port: 8088
+  gatewayserver_game_tcp_port: 7777
+  gatewayserver_room_tcp_port: 7778
+  gameserver_tcp_port: 9000
+
+  # RPC port configurations for internal microservices.
+  # Each service that exposes an RPC interface should have its port defined here.
+  servicerpcports:
+    gameserver: 50051
+    roomserver: 50052     # RPC port for roomserver
+    friendserver: 50053   # RPC port for friendserver
+    payserver: 50054      # RPC port for payserver
+    loginserver: 50055
+    gatewayserver: 50056
+    gmserver: 50057
+    gatewayserver_gmserver: 50058
+    # Add other services like 'matchingserver' and their RPC ports here as they are developed.
+# 新增好友系统配置
+friend:
+  max_friends: 200              # 最大好友数量
+  max_friend_requests: 50       # 最大待处理好友申请数
+  request_expire_days: 7        # 好友申请过期天数
+  message_history_days: 30      # 聊天记录保存天数
+  max_message_length: 500       # 单条消息最大长度
+  max_daily_messages: 1000      # 每日最大发送消息数
+  block_list_max: 100          # 黑名单最大数量
+
+  # 好友功能开关
+  enable_friend_chat: true      # 是否启用好友聊天
+  enable_friend_invite: true    # 是否启用好友邀请
+  enable_friend_search: true    # 是否启用好友搜索
+  enable_intimacy: true         # 是否启用亲密度系统

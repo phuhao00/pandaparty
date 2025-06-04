@@ -1,0 +1,35 @@
+# Git
+.git/
+.gitignore
+
+# IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.DS_Store
+
+# Local build artifacts / executables
+*.exe
+*.out
+bin/
+build/
+
+# Log files
+*.log
+logs/
+
+# Test files (if not running tests in image)
+*_test.go
+
+# Docker specific files (often not needed in context copied to Docker daemon)
+Dockerfile
+docker-compose.yaml
+*.dockerfile # if other naming convention is used
+
+# Local environment files
+.env
+
+# Go specific build cache / modules (if vendoring is not strictly used and relying on go mod download in Dockerfile)
+# vendor/ # If you `go mod vendor` and copy it, then don't ignore. If not, ignore. Assuming not for now.

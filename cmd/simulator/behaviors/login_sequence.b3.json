@@ -1,0 +1,29 @@
+{
+    "title": "LoginSequence",
+    "description": "Behavior tree for client login process",
+    "root": "seq_login",
+    "trees": [{
+        "id": "seq_login",
+        "title": "LoginActions",
+        "name": "Sequence",
+        "category": "composite",
+        "children": [
+            "action_connect_to_gateway",
+            "action_login"
+        ]
+    }],
+    "custom_nodes": [
+        {
+            "name": "ActionConnectToGateway",
+            "category": "action",
+            "title": "Connect to Gateway",
+            "description": "Simulates connecting to the gateway server"
+        },
+        {
+            "name": "ActionLogin",
+            "category": "action",
+            "title": "Perform Login",
+            "description": "Simulates the login HTTP request"
+        }
+    ]
+}

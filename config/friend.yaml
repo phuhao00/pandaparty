@@ -1,0 +1,15 @@
+# 新增好友系统配置
+friend:
+  max_friends: 200              # 最大好友数量
+  max_friend_requests: 50       # 最大待处理好友申请数
+  request_expire_days: 7        # 好友申请过期天数
+  message_history_days: 30      # 聊天记录保存天数
+  max_message_length: 500       # 单条消息最大长度
+  max_daily_messages: 1000      # 每日最大发送消息数
+  block_list_max: 100          # 黑名单最大数量
+  
+  # 好友功能开关
+  enable_friend_chat: true      # 是否启用好友聊天
+  enable_friend_invite: true    # 是否启用好友邀请
+  enable_friend_search: true    # 是否启用好友搜索
+  enable_intimacy: true         # 是否启用亲密度系统

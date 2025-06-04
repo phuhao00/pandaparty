@@ -1,0 +1,43 @@
+{
+    "title": "SimpleGameplay",
+    "description": "Behavior tree for basic gameplay actions",
+    "root": "seq_game_actions",
+    "trees": [{
+        "id": "seq_game_actions",
+        "title": "GamePlayActions",
+        "name": "Sequence",
+        "category": "composite",
+        "children": [
+            "action_roll_dice",
+            "action_move",
+            "action_play_card",
+            "action_end_turn"
+        ]
+    }],
+    "custom_nodes": [
+        {
+            "name": "ActionRollDice",
+            "category": "action",
+            "title": "Roll Dice",
+            "description": "Simulates rolling the dice"
+        },
+        {
+            "name": "ActionMove",
+            "category": "action",
+            "title": "Move Player",
+            "description": "Simulates moving the player on the board"
+        },
+        {
+            "name": "ActionPlayCard",
+            "category": "action",
+            "title": "Play a Card",
+            "description": "Simulates playing a card"
+        },
+        {
+            "name": "ActionEndTurn",
+            "category": "action",
+            "title": "End Turn",
+            "description": "Simulates ending the current turn"
+        }
+    ]
+}

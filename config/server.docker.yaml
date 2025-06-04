@@ -1,0 +1,86 @@
+# Docker-specific configuration. Backend services point to Docker Compose service names.
+# Redis configuration for session storage, caching, etc.
+redis:
+  addr: "redis:6379" # Redis server address and port (used for single node)
+  password: ""           # Redis password (if any), also used for Sentinel authenticated connections if needed.
+  db: 0                  # Redis database number, also used with Sentinel.
+  #
+  # For Redis Sentinel setup, ensure 'addr' might be one of the sentinel addresses or a placeholder if sentinel_addrs is exhaustive.
+  # Then, uncomment and configure the following:
+  # master_name: "mymaster"
+  # sentinel_addrs:
+  #   - "sentinel1:26379" # Example: replace with actual sentinel addresses
+  #   - "sentinel2:26380"
+  #   - "sentinel3:26381"
+  # # Note: 'password' and 'db' above are still used when connecting to the master via Sentinel.
+
+# MongoDB configuration for persistent data storage.
+mongo:
+  uri: "mongodb://mongo:27017" # MongoDB connection URI. This is the primary and simplest way.
+  # If the URI above is not sufficient, or you prefer a more structured configuration,
+  # you can use the fields below. Note that the official Go MongoDB driver gives precedence
+  # to the URI if both are fully specified. These options are useful if the URI is minimal
+  # (e.g. just "mongodb://mongo") or for clarity.
+  #
+  # hosts:
+  #   - "mongo1:27017"
+  #   - "mongo2:27017"
+  #   - "mongo3:27017"
+  # replica_set: "myReplicaSet"
+  # username: "myUser"
+  # password: "myPassword" # IMPORTANT: For production, use environment variables or a secrets manager for passwords.
+  # auth_source: "admin" # Or the database the user is defined in.
+  # connect_timeout_ms: 10000 # Connection timeout in milliseconds.
+  # max_pool_size: 100 # Maximum number of connections in the connection pool.
+  #
+  database: "dafuweng"             # Default database name for the application
+  collection: "config"             # Example collection (specific services might use others like 'players', 'friendships', 'payments')
+
+# Consul configuration for service discovery.
+consul:
+  addr: "consul:8500" # Consul agent address and port.
+  # In a clustered environment, this should typically point to a local Consul agent
+  # running on the same node as this service. The local agent is then part of the
+  # larger Consul cluster and handles routing to Consul servers.
+  # Alternatively, for some setups, this could be a load balancer address 
+  # in front of multiple Consul servers, or a DNS name resolving to them.
+
+# NSQ configuration for asynchronous messaging.
+nsq:
+  nsqd_addr: "nsqd:4150"     # NSQD address for producing messages (used if nsqd_addresses or nsqlookupd_http_addresses are not specified or for direct connection)
+  #
+  # For connecting to a list of NSQDs (e.g., for a producer that doesn't use lookupd):
+  # nsqd_addresses:
+  #   - "nsqd1:4150"
+  #   - "nsqd2:4150"
+  #
+  # For NSQLookupd connections (primarily for consumers, but can also be used by producers to discover nsqds):
+  # nsqlookupd_http_addresses:
+  #   - "nsqlookupd1:4161"
+  #   - "nsqlookupd2:4161"
+  #
+  topic: "dafuweng_topic"         # Default NSQ topic (can be overridden by specific producers/consumers)
+  channel: "dafuweng_channel"     # Default NSQ channel (can be overridden by specific consumers)
+
+# Server-specific configurations.
+server:
+  # NOTE: For proper service registration in Docker, individual servers should ideally register their own Docker service name (e.g., "loginserver") 
+  # as their address with Consul, not this global 'host' value if it's "localhost". This may require code changes in how each server calls consul.RegisterService.
+  host: "localhost"       # Default host for services to register with Consul (e.g., the machine's IP or a resolvable hostname)
+  register_self_as_host: true # For Docker: services register their own container name as host
+  # port: 8080              # Default main port for services (e.g., loginserver's HTTP port) - Deprecated
+  loginserver_http_port: 8081
+  gmserver_http_port: 8088
+  gatewayserver_tcp_port: 7777
+  
+  # RPC port configurations for internal microservices.
+  # Each service that exposes an RPC interface should have its port defined here.
+  servicerpcports:
+    gameserver: 50051
+    roomserver: 50052     # RPC port for roomserver
+    friendserver: 50053   # RPC port for friendserver
+    payserver: 50054      # RPC port for payserver
+    loginserver: 50055
+    gatewayserver: 50056
+    gmserver: 50057
+    # Add other services like 'matchingserver' and their RPC ports here as they are developed.

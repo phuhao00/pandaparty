@@ -1,0 +1,174 @@
+version: '3.8'
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
+  redis-data:
+
+services:
+  # Backend Infrastructure
+  mongo:
+    image: mongo:5.0 
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - app-network
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - app-network
+
+  consul:
+    image: consul:1.15 # Use a specific version
+    container_name: consul
+    ports:
+      - "8500:8500" # API, UI
+      - "8600:8600/tcp" # DNS
+      - "8600:8600/udp" # DNS
+    command: "agent -dev -client 0.0.0.0 -ui"
+    networks:
+      - app-network
+
+  nsqlookupd:
+    image: nsqio/nsq:v1.2.1 # Use a specific version
+    container_name: nsqlookupd
+    command: /nsqlookupd
+    ports:
+      - "4160:4160" # TCP
+      - "4161:4161" # HTTP
+    networks:
+      - app-network
+
+  nsqd:
+    image: nsqio/nsq:v1.2.1
+    container_name: nsqd
+    command: /nsqd --lookupd-tcp-address=nsqlookupd:4160 --broadcast-address=nsqd --data-path=/data
+    ports:
+      - "4150:4150" # TCP
+      - "4151:4151" # HTTP
+    volumes:
+      - ./nsq-data:/data # Simple local volume for nsqd data for persistence across restarts
+    depends_on:
+      - nsqlookupd
+    networks:
+      - app-network
+
+  # Application Servers
+  loginserver:
+    build:
+      context: .
+      dockerfile: cmd/loginserver/Dockerfile
+    container_name: loginserver
+    ports:
+      - "8081:8081" # LoginserverHTTPPort
+      # RPC port 50055 is not typically exposed to host unless for direct testing
+    volumes:
+      - ./config/server.docker.yaml:/app/config/server.yaml:ro
+    networks:
+      - app-network
+    depends_on:
+      - consul
+      - mongo
+      - redis
+
+  gmserver:
+    build:
+      context: .
+      dockerfile: cmd/gmserver/Dockerfile
+    container_name: gmserver
+    ports:
+      - "8088:8088" # GMServerHTTPPort
+    volumes:
+      - ./config/server.docker.yaml:/app/config/server.yaml:ro
+    networks:
+      - app-network
+    depends_on:
+      - consul
+      # Add other direct dependencies if gmserver logic implies them at startup
+
+  gatewayserver:
+    build:
+      context: .
+      dockerfile: cmd/gatewayserver/Dockerfile
+    container_name: gatewayserver
+    ports:
+      - "7777:7777" # GatewayserverTCPPort
+    volumes:
+      - ./config/server.docker.yaml:/app/config/server.yaml:ro
+    networks:
+      - app-network
+    depends_on:
+      - consul
+      # Add other dependencies (e.g. if it directly connects to gameservers at startup, or relies on NSQ)
+
+  friendserver:
+    build:
+      context: .
+      dockerfile: cmd/friendserver/Dockerfile
+    container_name: friendserver
+    volumes:
+      - ./config/server.docker.yaml:/app/config/server.yaml:ro
+    networks:
+      - app-network
+    depends_on:
+      - consul
+      - mongo
+      - redis # Assuming friendserver might use Redis for caching or presence
+
+  gameserver:
+    build:
+      context: .
+      dockerfile: cmd/gameserver/Dockerfile
+    container_name: gameserver
+    volumes:
+      - ./config/server.docker.yaml:/app/config/server.yaml:ro
+    networks:
+      - app-network
+    depends_on:
+      - consul
+      - mongo
+      - redis
+      - roomserver # If it makes calls to roomserver during its startup sequence or expects it
+      # - nsqd # If it produces/consumes messages
+
+  payserver:
+    build:
+      context: .
+      dockerfile: cmd/payserver/Dockerfile
+    container_name: payserver
+    volumes:
+      - ./config/server.docker.yaml:/app/config/server.yaml:ro
+    networks:
+      - app-network
+    depends_on:
+      - consul
+      - mongo
+      - redis
+      - nsqd # Payserver uses NSQ producer
+
+  roomserver:
+    build:
+      context: .
+      dockerfile: cmd/roomserver/Dockerfile
+    container_name: roomserver
+    volumes:
+      - ./config/server.docker.yaml:/app/config/server.yaml:ro
+    networks:
+      - app-network
+    depends_on:
+      - consul
+      - mongo # Assuming room data or persistence might use Mongo
+      - redis # Assuming room state or listings might use Redis
+      - nsqd  # Roomserver uses NSQ producer
