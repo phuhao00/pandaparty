@@ -164,6 +164,14 @@ Detailed API specifications:
 *   **`tools/`**: Utility scripts (e.g., `genproto.sh` for protobuf generation).
 *   **`pkg/`**: (Optional) Shared utility libraries that are not specific to this project's infrastructure. (Currently not extensively used).
 
+
+
+## Consul->discovery (Brief)
+
+![](https://github.com/phuhao00/pandaparty/blob/main/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20250604084218.png)
+
+## Extra:
+
 ---
 ```sh
 #!/bin/bash
@@ -178,7 +186,7 @@ docker run --name nsqd -p 4150:4150 -p 4151:4151     nsqio/nsq /nsqd     --broad
 
 
 ```
-## MongoDB surport
+### MongoDB surport
 go install github.com/favadi/protoc-go-inject-tag@latest
 
 This README provides a high-level overview. For more details, consult the specific documentation files and code comments within each module.
