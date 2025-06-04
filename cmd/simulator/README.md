@@ -1,6 +1,6 @@
 # Client Simulator
 
-This directory contains a Go application that simulates client activity for the dafuweng game server. It can be used for:
+This directory contains a Go application that simulates client activity for the panda game server. It can be used for:
 
 *   **System-level testing:** Simulating one or more clients performing typical user flows.
 *   **Stress testing:** Simulating a large number of concurrent clients to load the server.
