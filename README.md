@@ -2,6 +2,10 @@
 
 `pandaparty` is a backend system for a game, built using a microservice architecture in Go. It features services for login, game logic, room management, friend lists, and payments.
 
+## game will look like:
+[![IMAGE ALT TEXT](http://img.youtube.com/vi/YOUTUBE_VIDEO_ID_HERE/0.jpg)](https://www.bilibili.com/video/BV1R9TXzrEYe/?share_source=copy_web&vd_source=c40bfea6224e3ae1166ec83529576959)
+
+
 ## Table of Contents
 
 - [Services Overview](#services-overview)
